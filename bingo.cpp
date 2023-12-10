@@ -24,21 +24,20 @@ struct BingoGame {
 };
 
 void pressEnterToContinue() {
-    cout << "Press Enter to continue..." <<endl;
+    cout << "Tekan Untuk Melanjutkan..." <<endl;
     cin.get();
 }
 
 void initializeGame(BingoGame &game) {
     
-    cout << "Enter the number of players: ";
+    cout << "Masukkan Jumlah Pemain: ";
     cin >> game.numPlayers;
 
-   
     game.players = new BingoPlayer[game.numPlayers];
 
     // Initialize players' Bingo cards
     for (int k = 0; k < game.numPlayers; ++k) {
-        cout << "Enter the name of Player " << k + 1 << ": ";
+        cout << "Masukkan Nama Pemain Ke-" << k + 1 << ": ";
         cin >> game.players[k].name;
 
         for (int i = 0; i < BOARD_SIZE; ++i) {
@@ -127,7 +126,7 @@ bool checkWinner(const BingoCard &card) {
 }
 
 void displayCard(const BingoCard &card) {
-    cout << "Player's Bingo Card:" << endl;
+    cout << "Kartu Bingo Pemain:" << endl;
 
     for (int i = 0; i < BOARD_SIZE; ++i) {
         for (int j = 0; j < BOARD_SIZE; ++j) {
@@ -150,23 +149,22 @@ void playBingo() {
     while (true) {
         // Display game status for each player
         for (int k = 0; k < game.numPlayers; ++k) {
-            cout << "Player " << game.players[k].name << "'s turn:" << endl;
+            cout << "Sekarang Adalah Giliran Pemain " << game.players[k].name << "!" << endl;
             pressEnterToContinue(); 
             displayCard(game.players[k].card);
 
             
             int drawnNumber = drawNumber(game);
-            cout << "Number drawn: " << drawnNumber << endl;
+            cout << "Angka Yang Ditarik: " << drawnNumber << endl;
 
             
             updateCard(game.players[k].card, drawnNumber);
 
-           
             displayCard(game.players[k].card);
 
             
             if (checkWinner(game.players[k].card)) {
-                cout << "Bingo! " << game.players[k].name << " is a winner!" << endl;
+                cout << "Bingo!, " << game.players[k].name << " Adalah Pemenangnya. YEEEEEE" << endl;
                 return;
             }
 
@@ -187,7 +185,7 @@ int main() {
     
     system("cls");
 	cout <<"======================================================================" << endl;
-	cout << "                   Selamat Datang di Permainan Bingo!                " << endl;
+	cout << "                   Selamat Datang di Permainan Bingo!                " << endl;\
 	cout <<"======================================================================" << endl;
     srand(static_cast<unsigned int>(time(nullptr)));
 
