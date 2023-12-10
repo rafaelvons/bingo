@@ -1,39 +1,65 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <limits>
+
 using namespace std;
+
 const int BOARD_SIZE = 5;
 
 struct BingoCard {
     int numbers[BOARD_SIZE][BOARD_SIZE];
 };
 
+struct BingoPlayer {
+    string name;
+    BingoCard card;
+};
+
 struct BingoGame {
     int drawnNumbers[BOARD_SIZE * BOARD_SIZE];
     int drawnCount;
-    BingoCard playerCard;
+    BingoPlayer* players;
+    int numPlayers;
 };
 
+void pressEnterToContinue() {
+    cout << "Press Enter to continue..." <<endl;
+    cin.get();
+}
+
 void initializeGame(BingoGame &game) {
-    // Initialize player's Bingo card
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        for (int j = 0; j < BOARD_SIZE; ++j) {
-            game.playerCard.numbers[i][j] = rand() % 15 + 1; // Generate random numbers (1-15)
+    
+    cout << "Enter the number of players: ";
+    cin >> game.numPlayers;
+
+   
+    game.players = new BingoPlayer[game.numPlayers];
+
+    // Initialize players' Bingo cards
+    for (int k = 0; k < game.numPlayers; ++k) {
+        cout << "Enter the name of Player " << k + 1 << ": ";
+        cin >> game.players[k].name;
+
+        for (int i = 0; i < BOARD_SIZE; ++i) {
+            for (int j = 0; j < BOARD_SIZE; ++j) {
+                game.players[k].card.numbers[i][j] = rand() % 15 + 1; 
+            }
         }
     }
 
-    // Initialize drawn numbers
+    
     game.drawnCount = 0;
 }
 
 int drawNumber(BingoGame &game) {
-    // Draw a random number and ensure it hasn't been drawn before
+    
     int drawnNumber;
     bool alreadyDrawn;
 
     do {
         alreadyDrawn = false;
-        drawnNumber = rand() % 15 + 1; // Generate random numbers (1-15)
+        drawnNumber = rand() % 15 + 1; 
 
         for (int i = 0; i < game.drawnCount; ++i) {
             if (game.drawnNumbers[i] == drawnNumber) {
@@ -43,26 +69,24 @@ int drawNumber(BingoGame &game) {
         }
     } while (alreadyDrawn);
 
-    // Record the drawn number
+    
     game.drawnNumbers[game.drawnCount++] = drawnNumber;
 
     return drawnNumber;
 }
 
-void updateCard(BingoGame &game, int drawnNumber) {
-    // Update player's Bingo card after a number is drawn
+void updateCard(BingoCard &card, int drawnNumber) {
+    
     for (int i = 0; i < BOARD_SIZE; ++i) {
         for (int j = 0; j < BOARD_SIZE; ++j) {
-            if (game.playerCard.numbers[i][j] == drawnNumber) {
-                game.playerCard.numbers[i][j] = 0; // Mark the drawn number on the card
+            if (card.numbers[i][j] == drawnNumber) {
+                card.numbers[i][j] = 0; 
             }
         }
     }
 }
 
 bool checkWinner(const BingoCard &card) {
-    // Check if the player has achieved a winning pattern or filled the entire Bingo card
- // Check rows and columns
     for (int i = 0; i < BOARD_SIZE; ++i) {
         bool rowWin = true;
         bool colWin = true;
@@ -82,7 +106,6 @@ bool checkWinner(const BingoCard &card) {
         }
     }
 
-    // Check diagonals
     bool diag1Win = true;
     bool diag2Win = true;
 
@@ -101,53 +124,74 @@ bool checkWinner(const BingoCard &card) {
     }
 
     return false;
-   
 }
 
 void displayCard(const BingoCard &card) {
-    // Display the player's Bingo card
     cout << "Player's Bingo Card:" << endl;
 
     for (int i = 0; i < BOARD_SIZE; ++i) {
         for (int j = 0; j < BOARD_SIZE; ++j) {
             cout << card.numbers[i][j] << "\t";
         }
-        cout <<" "<<endl;
+        cout << endl;
     }
 
-    cout <<" " <<endl;
+    cout << endl;
 }
 
 void playBingo() {
-    // Main function to organize the Bingo game
+    
     BingoGame game;
     initializeGame(game);
 
-    while (!checkWinner(game.playerCard)) {
-        // Display game status
-        displayCard(game.playerCard);
+    int turnsBeforeClear = game.numPlayers; 
+    int currentTurn = 0;
 
-        // Draw a number
-        int drawnNumber = drawNumber(game);
-        cout << "Number drawn: " << drawnNumber << endl;
+    while (true) {
+        // Display game status for each player
+        for (int k = 0; k < game.numPlayers; ++k) {
+            cout << "Player " << game.players[k].name << "'s turn:" << endl;
+            pressEnterToContinue(); 
+            displayCard(game.players[k].card);
 
-        // Update Bingo card
-        updateCard(game, drawnNumber);
+            
+            int drawnNumber = drawNumber(game);
+            cout << "Number drawn: " << drawnNumber << endl;
+
+            
+            updateCard(game.players[k].card, drawnNumber);
+
+           
+            displayCard(game.players[k].card);
+
+            
+            if (checkWinner(game.players[k].card)) {
+                cout << "Bingo! " << game.players[k].name << " is a winner!" << endl;
+                return;
+            }
+
+            currentTurn++;
+            
+            // Clear the screen after a specified number of turns
+            if (currentTurn % turnsBeforeClear == 0) {
+                pressEnterToContinue();
+                system("cls");
+            }
+        }
     }
-
-    // Display the winner
-    cout << "Bingo! You're a winner!" << endl;
 }
 
+
+
 int main() {
-	system("cls");
-	cout <<"======================================" << endl;
-	cout << "Selamat Datang di Permainan Bingo!" << endl;\
-	cout <<"======================================" << endl;
-    // Set seed for the rand() function
+    
+    system("cls");
+	cout <<"======================================================================" << endl;
+	cout << "                   Selamat Datang di Permainan Bingo!                " << endl;
+	cout <<"======================================================================" << endl;
     srand(static_cast<unsigned int>(time(nullptr)));
 
-    // Start the Bingo game
+    
     playBingo();
 
     return 0;
